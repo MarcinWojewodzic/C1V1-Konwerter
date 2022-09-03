@@ -8,6 +8,7 @@
 #ifndef INC_SM_H_
 #define INC_SM_H_
 #define TRANSITION_TABLE_SIZE sizeof(TransitionTable)/sizeof(SmTransitionTable_TypeDef)
+#include "main.h"
 typedef enum
 {
 	SM_STATE_INITIALIZE,
@@ -43,5 +44,5 @@ typedef struct
 	SmState_TypeDef State;
 	SmEvent_TypeDef NewEvent;
 } Sm_TypeDef;
-
+void SM_MainFunction();
 #endif /* INC_SM_H_ */

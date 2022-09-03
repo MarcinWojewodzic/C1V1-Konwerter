@@ -1,2 +1,5 @@
-../Core/Src/SM.c:16:6:SM_MainFunction	8	static
-../Core/Src/SM.c:26:6:SM_ChangeState	16	static
+../Core/Src/SM.c:26:6:SM_MainFunction	8	static
+../Core/Src/SM.c:38:13:SM_ChangeState	16	static
+../Core/Src/SM.c:50:13:SM_InitializeFunction	8	static
+../Core/Src/SM.c:60:13:SM_RunningFunction	8	static
+../Core/Src/SM.c:63:6:HAL_UARTEx_RxEventCallback	32	static
