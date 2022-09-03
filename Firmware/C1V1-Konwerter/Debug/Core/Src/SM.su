@@ -1,5 +1,10 @@
-../Core/Src/SM.c:24:6:SM_MainFunction	8	static
-../Core/Src/SM.c:36:13:SM_ChangeState	16	static
-../Core/Src/SM.c:48:13:SM_InitializeFunction	8	static
-../Core/Src/SM.c:58:13:SM_RunningFunction	8	static
-../Core/Src/SM.c:61:6:HAL_UARTEx_RxEventCallback	24	static
+../Core/Src/SM.c:36:6:SM_MainFunction	8	static
+../Core/Src/SM.c:48:13:SM_ChangeState	16	static
+../Core/Src/SM.c:59:13:SM_InitializeFunction	8	static
+../Core/Src/SM.c:69:13:SM_RunningFunction	8	static
+../Core/Src/SM.c:76:13:SM_WaitForMeasurmentIsFinished	8	static
+../Core/Src/SM.c:83:13:SM_SleppFunction	8	static
+../Core/Src/SM.c:93:13:SM_ParseUartFunction	8	static
+../Core/Src/SM.c:96:13:SM_DebugFunction	8	static
+../Core/Src/SM.c:99:13:SM_ErrorFunction	8	static
+../Core/Src/SM.c:103:6:HAL_UARTEx_RxEventCallback	24	static

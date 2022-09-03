@@ -94,13 +94,14 @@ int main(void)
    MX_DMA_Init();
    MX_I2C2_Init();
    MX_RTC_Init();
-   MX_USART1_UART_Init();
    MX_TIM17_Init();
+   MX_USART1_UART_Init();
 
    /* Initialize interrupts */
    MX_NVIC_Init();
    /* USER CODE BEGIN 2 */
    HAL_TIM_Base_Start(&htim17);
+   HAL_Delay(10000);
 
    /* USER CODE END 2 */
 
