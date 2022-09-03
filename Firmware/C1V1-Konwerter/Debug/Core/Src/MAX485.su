@@ -1,0 +1,5 @@
+../Core/Src/MAX485.c:9:6:Max485_SetStateListening	16	static
+../Core/Src/MAX485.c:14:6:Max485_SetStateSending	16	static
+../Core/Src/MAX485.c:19:6:Max485_StartListening	24	static
+../Core/Src/MAX485.c:23:6:Max485_StartSending	32	static
+../Core/Src/MAX485.c:27:6:Max485_Init	24	static
