@@ -104,8 +104,6 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	bh1750_Init(&Bh, &hi2c2, 35, One_Time_H_Resolution_Mode);
 	Max485_Init(&Max, &huart1, MAX485_Selector_GPIO_Port, MAX485_Selector_Pin);
-
-
   /* USER CODE END 2 */
 
   /* Infinite loop */

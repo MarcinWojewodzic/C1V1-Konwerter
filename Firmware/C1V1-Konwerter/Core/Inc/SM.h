@@ -7,6 +7,7 @@
 
 #ifndef INC_SM_H_
 #define INC_SM_H_
+#define TRANSITION_TABLE_SIZE sizeof(TransitionTable)/sizeof(SmTransitionTable_TypeDef)
 typedef enum
 {
 	SM_STATE_INITIALIZE,
@@ -18,6 +19,7 @@ typedef enum
 } SmState_TypeDef;
 typedef enum
 {
+	SM_EVENT_NOTHING,
 	SM_EVENT_INITIALIZE_OK,
 	SM_EVENT_ERROR,
 	SM_EVENT_END_RUNNING,
@@ -27,8 +29,19 @@ typedef enum
 } SmEvent_TypeDef;
 typedef struct
 {
+	SmState_TypeDef Source;
+	SmState_TypeDef Destination;
+	SmEvent_TypeDef Event;
+}SmTransitionTable_TypeDef;
+typedef struct
+{
+	void(*SmFunction)(void);
+}SmFunctions_TypeDef;
+typedef struct
+{
 	uint16_t LastTick;
 	SmState_TypeDef State;
+	SmEvent_TypeDef NewEvent;
 } Sm_TypeDef;
 
 #endif /* INC_SM_H_ */

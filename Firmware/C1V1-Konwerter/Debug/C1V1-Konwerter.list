@@ -35,15 +35,15 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  15 .debug_ranges 00001008  00000000  00000000  0003a208  2**3
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 16 .debug_macro  000171d5  00000000  00000000  0003b210  2**0
+ 16 .debug_macro  000171b9  00000000  00000000  0003b210  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 17 .debug_line   00018063  00000000  00000000  000523e5  2**0
+ 17 .debug_line   00018063  00000000  00000000  000523c9  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    0008ec45  00000000  00000000  0006a448  2**0
+ 18 .debug_str    0008ec45  00000000  00000000  0006a42c  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000050  00000000  00000000  000f908d  2**0
+ 19 .comment      00000050  00000000  00000000  000f9071  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  00003d6c  00000000  00000000  000f90e0  2**2
+ 20 .debug_frame  00003d6c  00000000  00000000  000f90c4  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -1124,7 +1124,6 @@ int main(void)
  8000790:	4904      	ldr	r1, [pc, #16]	; (80007a4 <main+0x50>)
  8000792:	4805      	ldr	r0, [pc, #20]	; (80007a8 <main+0x54>)
  8000794:	f7ff fe78 	bl	8000488 <Max485_Init>
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -1742,9 +1741,9 @@ void MX_TIM17_Init(void)
  8000a54:	4b0f      	ldr	r3, [pc, #60]	; (8000a94 <MX_TIM17_Init+0x44>)
  8000a56:	4a10      	ldr	r2, [pc, #64]	; (8000a98 <MX_TIM17_Init+0x48>)
  8000a58:	601a      	str	r2, [r3, #0]
-  htim17.Init.Prescaler = 0;
+  htim17.Init.Prescaler = 15;
  8000a5a:	4b0e      	ldr	r3, [pc, #56]	; (8000a94 <MX_TIM17_Init+0x44>)
- 8000a5c:	2200      	movs	r2, #0
+ 8000a5c:	220f      	movs	r2, #15
  8000a5e:	605a      	str	r2, [r3, #4]
   htim17.Init.CounterMode = TIM_COUNTERMODE_UP;
  8000a60:	4b0c      	ldr	r3, [pc, #48]	; (8000a94 <MX_TIM17_Init+0x44>)

@@ -1,0 +1,2 @@
+../Core/Src/SM.c:16:6:SM_MainFunction	8	static
+../Core/Src/SM.c:26:6:SM_ChangeState	16	static
