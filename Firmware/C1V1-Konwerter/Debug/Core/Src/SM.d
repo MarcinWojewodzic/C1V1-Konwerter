@@ -34,9 +34,8 @@ Core/Src/SM.o: ../Core/Src/SM.c ../Core/Inc/SM.h ../Core/Inc/main.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
- ../Core/Inc/MAX485.h ../Core/Inc/bh1750.h ../Core/Inc/i2c.h \
- ../Core/Inc/main.h ../Core/Inc/supp.h ../Core/Inc/usart.h \
- ../Core/Inc/Messages.h
+ ../Core/Inc/bh1750.h ../Core/Inc/i2c.h ../Core/Inc/main.h \
+ ../Core/Inc/supp.h ../Core/Inc/usart.h ../Core/Inc/Messages.h
 ../Core/Inc/SM.h:
 ../Core/Inc/main.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
@@ -74,7 +73,6 @@ Core/Src/SM.o: ../Core/Src/SM.c ../Core/Inc/SM.h ../Core/Inc/main.h \
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_tim_ex.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h:
-../Core/Inc/MAX485.h:
 ../Core/Inc/bh1750.h:
 ../Core/Inc/i2c.h:
 ../Core/Inc/main.h:

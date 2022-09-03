@@ -28,7 +28,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "SM.h"
-#include "MAX485.h"
 #include "bh1750.h"
 /* USER CODE END Includes */
 

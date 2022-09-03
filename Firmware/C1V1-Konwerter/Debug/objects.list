@@ -1,4 +1,3 @@
-"./Core/Src/MAX485.o"
 "./Core/Src/SM.o"
 "./Core/Src/bh1750.o"
 "./Core/Src/dma.o"

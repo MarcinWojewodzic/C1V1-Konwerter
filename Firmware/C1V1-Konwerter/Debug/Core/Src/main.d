@@ -36,8 +36,7 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal_uart_ex.h \
  ../Core/Inc/dma.h ../Core/Inc/main.h ../Core/Inc/gpio.h \
  ../Core/Inc/i2c.h ../Core/Inc/rtc.h ../Core/Inc/tim.h \
- ../Core/Inc/usart.h ../Core/Inc/SM.h ../Core/Inc/MAX485.h \
- ../Core/Inc/bh1750.h
+ ../Core/Inc/usart.h ../Core/Inc/SM.h ../Core/Inc/bh1750.h
 ../Core/Inc/main.h:
 ../Drivers/STM32G0xx_HAL_Driver/Inc/stm32g0xx_hal.h:
 ../Core/Inc/stm32g0xx_hal_conf.h:
@@ -82,5 +81,4 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Inc/tim.h:
 ../Core/Inc/usart.h:
 ../Core/Inc/SM.h:
-../Core/Inc/MAX485.h:
 ../Core/Inc/bh1750.h:

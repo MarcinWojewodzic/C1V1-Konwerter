@@ -28,6 +28,11 @@ typedef enum
 	SM_EVENT_UART,
 	SM_EVENT_DEBUG
 } SmEvent_TypeDef;
+typedef enum
+{
+	LS_LISTENING,
+	LS_TRANSMIT
+}LightSensorTransmit_Typedef;
 typedef struct
 {
 	SmState_TypeDef Source;

@@ -5,7 +5,6 @@
  *      Author: Marcin
  */
 #include "SM.h"
-#include "MAX485.h"
 #include "bh1750.h"
 #include "i2c.h"
 #include "main.h"
@@ -20,7 +19,6 @@ SmTransitionTable_TypeDef TransitionTable[] = { { SM_STATE_INITIALIZE, SM_STATE_
 SmFunctions_TypeDef Function[]              = { { SM_InitializeFunction }, { SM_RunningFunction } };
 Sm_TypeDef SmPtr                            = { 0 };
 bh1750_t Bh                                 = { 0 };
-Max485_Typedef Max                          = { 0 };
 uint8_t data[100];
 
 void SM_MainFunction()
@@ -50,17 +48,20 @@ static void SM_ChangeState()
 static void SM_InitializeFunction()
 {
    //   bh1750_Init(&Bh, &hi2c2, 35, One_Time_H_Resolution_Mode);
-   Max485_Init(&Max, &huart1, MAX485_Selector_GPIO_Port, MAX485_Selector_Pin);
-   Max485_StartListening(&Max, data, 100);
    SmPtr.NewEvent = SM_EVENT_INITIALIZE_OK;
-   Max485_SetStateSending(&Max);
-   Max485_StartSending(&Max, (uint8_t *)INITIALIZED_COMPLETE, sizeof(INITIALIZED_COMPLETE));
-   Max485_SetStateListening(&Max);
+   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
+   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, data, 100);
+   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
+   HAL_UART_Transmit(&huart1, (uint8_t *)INITIALIZED_COMPLETE, sizeof(INITIALIZED_COMPLETE) - 1, 1000);
+   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
 }
 static void SM_RunningFunction()
 {
 }
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
 {
-   Max485_ListeningAfterTalk(&Max, data, Size, data, Size);
+   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
+   HAL_UART_Transmit(huart, data, Size, 1000);
+   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
+   HAL_UARTEx_ReceiveToIdle_DMA(huart, data, 1000);
 }
