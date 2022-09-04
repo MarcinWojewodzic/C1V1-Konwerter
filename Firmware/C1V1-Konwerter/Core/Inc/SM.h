@@ -9,6 +9,7 @@
 #define INC_SM_H_
 #define TRANSITION_TABLE_SIZE sizeof(TransitionTable) / sizeof(SmTransitionTable_TypeDef)
 #include "main.h"
+//#define DEBUG_SWDIO
 typedef enum
 {
    SM_STATE_INITIALIZE,
@@ -37,9 +38,17 @@ typedef enum
 } LsTransmit_Typedef;
 typedef enum
 {
-	LS_NO_DEBUG,
-	LS_IN_DEBUG
-}LsDebugFlag_TypeDef;
+   LS_NO_DEBUG,
+   LS_DEBUG_COMMUNICATION,
+   LS_DEBUG_MEASURMENT,
+   LS_DEBUG_STATUS_AND_PARAM,
+   LS_DEBUG_ALL
+} LsDebugFlag_TypeDef;
+typedef enum
+{
+	LS_NO_UART_RECIVE,
+	LS_UART_RECIVE
+}LsUartFlag_TypeDef;
 typedef struct
 {
    SmState_TypeDef Source;
@@ -52,9 +61,16 @@ typedef struct
 } SmFunctions_TypeDef;
 typedef struct
 {
+   char *Commands;
+   uint16_t SizeCommands;
+} LsCommands_TypeDef;
+typedef struct
+{
    uint32_t LastTick;
    SmState_TypeDef State;
    SmEvent_TypeDef NewEvent;
+   LsDebugFlag_TypeDef DebugFlag;
+   LsUartFlag_TypeDef UartFlag;
 } Sm_TypeDef;
 void SM_MainFunction();
 #endif /* INC_SM_H_ */
