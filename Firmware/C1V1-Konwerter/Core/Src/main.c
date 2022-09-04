@@ -101,7 +101,7 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
    HAL_TIM_Base_Start(&htim17);
-   HAL_Delay(10000);
+   HAL_Delay(5000);
 
   /* USER CODE END 2 */
 
@@ -164,12 +164,12 @@ void SystemClock_Config(void)
   */
 static void MX_NVIC_Init(void)
 {
-  /* DMA1_Channel1_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
   /* USART1_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(USART1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(USART1_IRQn);
+  /* DMA1_Channel1_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(DMA1_Channel1_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(DMA1_Channel1_IRQn);
 }
 
 /* USER CODE BEGIN 4 */

@@ -8,6 +8,7 @@
 #ifndef INC_SM_H_
 #define INC_SM_H_
 #define TRANSITION_TABLE_SIZE sizeof(TransitionTable) / sizeof(SmTransitionTable_TypeDef)
+#define COMMANDS_TABLE_SIZE   sizeof(LsCommands) / sizeof(LsCommands_TypeDef)
 #include "main.h"
 //#define DEBUG_SWDIO
 typedef enum
@@ -29,6 +30,7 @@ typedef enum
    SM_EVENT_END_SLEEP,
    SM_EVENT_UART,
    SM_EVENT_DEBUG,
+   SM_EVENT_END_DEBUG,
    SM_EVENT_ERROR
 } SmEvent_TypeDef;
 typedef enum
@@ -46,9 +48,9 @@ typedef enum
 } LsDebugFlag_TypeDef;
 typedef enum
 {
-	LS_NO_UART_RECIVE,
-	LS_UART_RECIVE
-}LsUartFlag_TypeDef;
+   LS_NO_UART_RECIVE,
+   LS_UART_RECIVE
+} LsUartFlag_TypeDef;
 typedef struct
 {
    SmState_TypeDef Source;
@@ -71,6 +73,7 @@ typedef struct
    SmEvent_TypeDef NewEvent;
    LsDebugFlag_TypeDef DebugFlag;
    LsUartFlag_TypeDef UartFlag;
+   int Brightness;
 } Sm_TypeDef;
 void SM_MainFunction();
 #endif /* INC_SM_H_ */
