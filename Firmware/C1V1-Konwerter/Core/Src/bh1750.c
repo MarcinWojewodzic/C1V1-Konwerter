@@ -36,7 +36,7 @@ uint16_t bh1750_ReadMeasurment(bh1750_t *bh)
 uint16_t bh1750_ReadLuxOneTime(bh1750_t *bh)
 {
 	bh1750_SendStartMeasurment(bh);
-	HAL_Delay(200);
+	HAL_Delay(500);
 	uint16_t rowMeasurment=bh1750_ReadMeasurment(bh);
 	return rowMeasurment;
 }
