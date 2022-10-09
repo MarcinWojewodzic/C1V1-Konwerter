@@ -60,8 +60,8 @@ all: main-build
 main-build: C1V1-Konwerter.elf secondary-outputs
 
 # Tool invocations
-C1V1-Konwerter.elf C1V1-Konwerter.map: $(OBJS) $(USER_OBJS) C:\Users\Marcin\Desktop\C1V1\Firmware\C1V1-Konwerter\STM32G030J6MX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "C1V1-Konwerter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\Marcin\Desktop\C1V1\Firmware\C1V1-Konwerter\STM32G030J6MX_FLASH.ld" --specs=nosys.specs -Wl,-Map="C1V1-Konwerter.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+C1V1-Konwerter.elf C1V1-Konwerter.map: $(OBJS) $(USER_OBJS) C:\Users\M\Desktop\C1V1-Konwerter\Firmware\C1V1-Konwerter\STM32G030J6MX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "C1V1-Konwerter.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m0plus -T"C:\Users\M\Desktop\C1V1-Konwerter\Firmware\C1V1-Konwerter\STM32G030J6MX_FLASH.ld" --specs=nosys.specs -Wl,-Map="C1V1-Konwerter.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
