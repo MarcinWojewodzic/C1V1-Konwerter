@@ -1,0 +1,16 @@
+../Core/Src/MAXProtocol.c:43:6:MAX_Handle	8	static
+../Core/Src/MAXProtocol.c:51:6:MAX_Init	24	static
+../Core/Src/MAXProtocol.c:68:13:MAX_ChangeState	16	static
+../Core/Src/MAXProtocol.c:81:6:MAX_RegisterCommandFunction	16	static
+../Core/Src/MAXProtocol.c:85:6:MAX_RegisterDataFunction	16	static
+../Core/Src/MAXProtocol.c:89:6:MAX_RegisterMessageFunction	16	static
+../Core/Src/MAXProtocol.c:93:6:MAX_InterruptTask	8	static
+../Core/Src/MAXProtocol.c:97:6:MAX_SendData	40	static
+../Core/Src/MAXProtocol.c:114:13:MAX_SendResponseFunction	24	static
+../Core/Src/MAXProtocol.c:128:13:MAX_InitializeFunction	8	static
+../Core/Src/MAXProtocol.c:132:13:MAX_IdleFunction	8	static
+../Core/Src/MAXProtocol.c:146:13:MAX_ParseFunction	16	static
+../Core/Src/MAXProtocol.c:184:13:MAX_RunningFunction	16	static
+../Core/Src/MAXProtocol.c:219:13:MAX_SendFunction	16	static
+../Core/Src/MAXProtocol.c:236:13:MAX_WaitForResponseFunction	8	static
+../Core/Src/MAXProtocol.c:248:13:MAX_ParseResponseFunction	16	static

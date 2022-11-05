@@ -11,50 +11,37 @@
 #include "stdio.h"
 #include "supp.h"
 #ifndef DEBUG_SWDIO
-#include "usart.h"
+#include "MAXProtocol.h"
 #endif
-#include <Commands.h>
-#include <Messages.h>
-static void SM_InitializeFunction();
-static void SM_RunningFunction();
-static void SM_WaitForMeasurmentIsFinished();
-static void SM_SleppFunction();
-static void SM_ParseUartFunction();
-static void SM_DebugFunction();
-static void SM_ErrorFunction();
-static void SM_ChangeState();
+// #define DEBUG_SWDIO
+static void SM_ChangeState(void);
+static void SM_InitializeFunction(void);
+static void SM_RunningFunction(void);
+static void SM_WaitForSendFunction(void);
+static void SM_SleepFunction(void);
+void MAX_CommandTestFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart);
+void MAX_CommandStartMeasurmentFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart);
+void MAX_CommandGoToDeepSleepFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart);
 SmTransitionTable_TypeDef TransitionTable[] = { { SM_STATE_INITIALIZE, SM_STATE_RUNNING, SM_EVENT_INITIALIZE_OK },
-                                                { SM_STATE_RUNNING, SM_STATE_WAIT_FOR_MEASURMENT_IS_FINISHED, SM_EVENT_START_CONVESION },
-                                                { SM_STATE_WAIT_FOR_MEASURMENT_IS_FINISHED, SM_STATE_SLEEP, SM_EVENT_END_RUNNING },
+                                                { SM_STATE_RUNNING, SM_STATE_SLEEP, SM_EVENT_END_RUNNING },
                                                 { SM_STATE_SLEEP, SM_STATE_RUNNING, SM_EVENT_END_SLEEP },
-                                                { SM_STATE_RUNNING, SM_STATE_PARSE_UART, SM_EVENT_UART },
-                                                { SM_STATE_WAIT_FOR_MEASURMENT_IS_FINISHED, SM_STATE_PARSE_UART, SM_EVENT_UART },
-                                                { SM_STATE_SLEEP, SM_STATE_PARSE_UART, SM_EVENT_UART },
-                                                { SM_STATE_DEBUG, SM_STATE_PARSE_UART, SM_EVENT_UART },
-                                                { SM_STATE_PARSE_UART, SM_STATE_RUNNING, SM_EVENT_END_SLEEP },
-                                                { SM_STATE_PARSE_UART, SM_STATE_DEBUG, SM_EVENT_DEBUG },
-                                                { SM_STATE_DEBUG, SM_STATE_RUNNING, SM_EVENT_END_DEBUG },
-                                                { SM_STATE_SLEEP, SM_STATE_DEBUG, SM_EVENT_DEBUG },
-                                                { SM_STATE_WAIT_FOR_MEASURMENT_IS_FINISHED, SM_STATE_DEBUG, SM_EVENT_DEBUG } };
-SmFunctions_TypeDef Function[]
-    = { { SM_InitializeFunction }, { SM_RunningFunction }, { SM_WaitForMeasurmentIsFinished }, { SM_SleppFunction }, { SM_ParseUartFunction },
-        { SM_DebugFunction },      { SM_ErrorFunction } };
-LsCommands_TypeDef LsCommands[] = { { LS_START_MEASURMENT_COMMAND, sizeof(LS_START_MEASURMENT_COMMAND) - 1 },
-                                    { LS_DEBUG_COMMUNICATION_COMMAND, sizeof(LS_DEBUG_COMMUNICATION_COMMAND) - 1 },
-                                    { LS_DEBUG_ALL_COMMAND, sizeof(LS_DEBUG_ALL_COMMAND) - 1 },
-                                    { LS_DEBUG_MEASURMENT_COMMAND, sizeof(LS_DEBUG_MEASURMENT_COMMAND) - 1 },
-                                    { LS_DEBUG_GET_STATUS_AND_PARAM_COMMAND, sizeof(LS_DEBUG_GET_STATUS_AND_PARAM_COMMAND) - 1 },
-                                    { LS_DEBUG_STOP_COMMAND, sizeof(LS_DEBUG_STOP_COMMAND) - 1 },
-                                    { LS_STATUS_COMMAND, sizeof(LS_STATUS_COMMAND) - 1 },
-                                    { LS_RESET, sizeof(LS_RESET) - 1 } };
-Sm_TypeDef SmPtr                = { 0 };
-bh1750_t Bh                     = { 0 };
-uint8_t SizeUartData            = 0;
-uint8_t data[100]               = { 0 };
-
+                                                { SM_STATE_RUNNING, SM_STATE_WAIT_FOR_SEND, SM_EVENT_START_SENDING },
+                                                { SM_STATE_WAIT_FOR_SEND, SM_STATE_SLEEP, SM_EVENT_END_RUNNING } };
+SmFunctions_TypeDef Function[]              = { { SM_InitializeFunction }, { SM_RunningFunction }, { SM_WaitForSendFunction }, { SM_SleepFunction } };
+Sm_TypeDef SmPtr                            = { 0 };
+bh1750_t Bh                                 = { 0 };
+#ifndef DEBUG_SWDIO
+MAX_TypeDef MAX = { 0 };
+#endif
 void SM_MainFunction()
 {
-   if(HAL_GetTick() - SmPtr.LastTick > 1000)
+#ifndef DEBUG_SWDIO
+   if(MAX.Initialize == MAX_INITIALIZE)
+   {
+      MAX_Handle();
+   }
+#endif
+   if(HAL_GetTick() - SmPtr.LastTick > 10)
    {
       SM_ChangeState();
       SmPtr.LastTick = HAL_GetTick();
@@ -64,261 +51,82 @@ void SM_MainFunction()
       }
    }
 }
-static void SM_ChangeState()
+static void SM_ChangeState(void)
 {
    for(int i = 0; i < TRANSITION_TABLE_SIZE; i++)
    {
       if(SmPtr.State == TransitionTable[i].Source && SmPtr.NewEvent == TransitionTable[i].Event)
       {
-         SmPtr.State = TransitionTable[i].Destination;
+         SmPtr.State    = TransitionTable[i].Destination;
+         SmPtr.NewEvent = SM_EVENT_NOTHING;
+         return;
       }
    }
    SmPtr.NewEvent = SM_EVENT_NOTHING;
 }
-static void SM_InitializeFunction()
+static void SM_InitializeFunction(void)
 {
-   bh1750_Init(&Bh, &hi2c2, 35, One_Time_H_Resolution_Mode);
-#ifndef DEBUG_SWDIO
 
-   SmPtr.DebugFlag = LS_NO_DEBUG;
-   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-   HAL_UARTEx_ReceiveToIdle_DMA(&huart1, data, 100);
-   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
-   HAL_UART_Transmit(&huart1, (uint8_t *)INITIALIZED_COMPLETE, sizeof(INITIALIZED_COMPLETE) - 1, 1000);
-   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-#endif
+   MAX_Init(&MAX, MAX_BS);
+   MAX_RegisterCommandFunction(MAX_TEST, MAX_CommandTestFunction);
+   MAX_RegisterCommandFunction(MAX_START_MEASURMENT, MAX_CommandStartMeasurmentFunction);
+   MAX_RegisterCommandFunction(MAX_GO_TO_DEEP_SLEEP, MAX_CommandGoToDeepSleepFunction);
+
+   bh1750_Init(&Bh, &hi2c2, 35, One_Time_H_Resolution_Mode);
    SmPtr.NewEvent = SM_EVENT_INITIALIZE_OK;
 }
-static void SM_RunningFunction()
+static void SM_RunningFunction(void)
 {
-   if(SmPtr.DebugFlag == LS_DEBUG_ALL)
+   if(MAX.State == MAX_STATE_IDLE)
    {
-#ifndef DEBUG_SWDIO
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
-      HAL_UART_Transmit(&huart1, (uint8_t *)STATE_ID_RUNNING, sizeof(STATE_ID_RUNNING) - 1, 1000);
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-#endif
-   }
-   SmPtr.Brightness = bh1750_ReadLuxOneTime(&Bh);
-   uint8_t BrightnessToSend[10], l;
-   l = sprintf((char *)BrightnessToSend, "%d \n", SmPtr.Brightness);
-#ifndef DEBUG_SWDIO
-   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
-   HAL_UART_Transmit(&huart1, BrightnessToSend, l, 1000);
-   HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-#endif
-   if(SmPtr.UartFlag == LS_NO_UART_RECIVE)
-   {
-      SmPtr.NewEvent = SM_EVENT_START_CONVESION;
-   }
-   else
-   {
-      SmPtr.NewEvent = SM_EVENT_UART;
-   }
-}
-static void SM_WaitForMeasurmentIsFinished()
-{
-
-   if(SmPtr.DebugFlag == LS_DEBUG_ALL)
-   {
-#ifndef DEBUG_SWDIO
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
-      HAL_UART_Transmit(&huart1, (uint8_t *)STATE_ID_WAIT_FOR_MEASURMENT_IS_FINISHED, sizeof(STATE_ID_WAIT_FOR_MEASURMENT_IS_FINISHED) - 1, 1000);
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-#endif
-   }
-
-   if(SmPtr.UartFlag == LS_NO_UART_RECIVE)
-   {
-      if(SmPtr.DebugFlag == LS_DEBUG_MEASURMENT)
+      if(SmPtr.MeasurmentFlag == SM_FLAG_SET)
       {
-         SmPtr.NewEvent = SM_EVENT_DEBUG;
+         SmPtr.MeasurmentFlag = SM_FLAG_RESET;
+         SmPtr.Brightness     = bh1750_ReadLuxOneTime(&Bh);
+         SmPtr.NewEvent       = SM_EVENT_START_SENDING;
+         MAX_SendData(MAX_ODWS, MAX_DATA, (uint8_t *)&SmPtr.Brightness, 2);
       }
       else
       {
          SmPtr.NewEvent = SM_EVENT_END_RUNNING;
       }
    }
-   else
-   {
-      SmPtr.NewEvent = SM_EVENT_UART;
-   }
-   // TODO
 }
-static void SM_SleppFunction()
+static void SM_WaitForSendFunction(void)
 {
-#ifndef DEBUG_SWDIO
-   if(SmPtr.DebugFlag == LS_DEBUG_ALL)
+   if(MAX.State == MAX_STATE_IDLE)
    {
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
-      HAL_UART_Transmit(&huart1, (uint8_t *)STATE_ID_SLEEP, sizeof(STATE_ID_SLEEP) - 1, 1000);
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-   }
-   if(SmPtr.DebugFlag != LS_DEBUG_ALL)
-   {
-      HAL_SuspendTick();
-      HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
-      HAL_ResumeTick();
-   }
-#endif
-   if(SmPtr.UartFlag == LS_NO_UART_RECIVE)
-   {
-      if(SmPtr.DebugFlag == LS_DEBUG_ALL)
-      {
-         SmPtr.NewEvent = SM_EVENT_DEBUG;
-      }
-      else
-      {
-         SmPtr.NewEvent = SM_EVENT_END_SLEEP;
-      }
-   }
-   else
-   {
-      SmPtr.NewEvent = SM_EVENT_UART;
+      SmPtr.NewEvent = SM_EVENT_END_RUNNING;
    }
 }
-static void SM_ParseUartFunction()
+static void SM_SleepFunction(void)
 {
-   uint8_t Parse   = 1;
-   uint8_t Command = 255;
-   for(int i = 0; i < COMMANDS_TABLE_SIZE; i++)
-   {
-      Parse = 1;
-      for(int j = 0; j < SizeUartData; j++)
-      {
-         if(data[j] != LsCommands[i].Commands[j])
-         {
-            Parse = 0;
-            break;
-         }
-      }
-      if(Parse == 1)
-      {
-         Command = i;
-         break;
-      }
-   }
-   switch(Command)
-   {
-      case LS_START_MEASURMENT_COMMAND_NUMBER:
-      {
-         SmPtr.NewEvent = SM_EVENT_END_SLEEP;
-         break;
-      }
-      case LS_DEBUG_COMMUNICATION_COMMAND_NUMBER:
-      {
-         SmPtr.DebugFlag = LS_DEBUG_COMMUNICATION;
-         SmPtr.NewEvent  = SM_EVENT_DEBUG;
-         break;
-      }
-      case LS_DEBUG_ALL_COMMAND_NUMBER:
-      {
-         SmPtr.NewEvent  = SM_EVENT_DEBUG;
-         SmPtr.DebugFlag = LS_DEBUG_ALL;
-         break;
-      }
-      case LS_DEBUG_MEASURMENT_COMMAND_NUMBER:
-      {
-         SmPtr.NewEvent  = SM_EVENT_DEBUG;
-         SmPtr.DebugFlag = LS_DEBUG_MEASURMENT;
-         break;
-      }
-      case LS_DEBUG_GET_STATUS_AND_PARAM_COMMAND_NUMBER:
-      {
-         SmPtr.NewEvent  = SM_EVENT_DEBUG;
-         SmPtr.DebugFlag = LS_DEBUG_STATUS_AND_PARAM;
-         break;
-      }
-      case LS_DEBUG_STOP_COMMAND_NUMBER:
-      {
-         SmPtr.DebugFlag = LS_NO_DEBUG;
-         SmPtr.NewEvent  = SM_EVENT_DEBUG;
-         break;
-      }
-      case LS_STATUS_COMMAND_NUMBER:
-      {
-         // TODO
-         break;
-      }
-      case LS_RESET_NUMBER:
-      {
-         HAL_NVIC_SystemReset();
-         break;
-      }
-      default:
-      {
-         SmPtr.NewEvent = SM_EVENT_DEBUG;
-      }
-   }
-   if(Command != 255)
-   {
-#ifndef DEBUG_SWDIO
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
-      HAL_UART_Transmit(&huart1, (uint8_t *)LsCommands[Command].Commands, LsCommands[Command].SizeCommands, 1000);
-      HAL_UART_Transmit(&huart1, (uint8_t *)LS_STATUS_OK, sizeof(LS_STATUS_OK) - 1, 1000);
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-#endif
-   }
-   else if(SmPtr.DebugFlag != LS_DEBUG_COMMUNICATION)
-   {
-#ifndef DEBUG_SWDIO
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
-      HAL_UART_Transmit(&huart1, (uint8_t *)LS_STATUS_ERROR, sizeof(LS_STATUS_ERROR) - 1, 1000);
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-#endif
-   }
 
-   SmPtr.UartFlag = LS_NO_UART_RECIVE;
-}
-static void SM_DebugFunction()
-{
-#ifndef DEBUG_SWDIO
-   if(SmPtr.DebugFlag == LS_DEBUG_ALL)
+   if(SmPtr.DeepSleepFlag == SM_FLAG_SET)
    {
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
-      HAL_UART_Transmit(&huart1, (uint8_t *)STATE_ID_DEBUG, sizeof(STATE_ID_DEBUG) - 1, 1000);
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-   }
-#endif
-   if(SmPtr.DebugFlag == LS_DEBUG_ALL || SmPtr.DebugFlag == LS_DEBUG_MEASURMENT)
-   {
-      SmPtr.NewEvent = SM_EVENT_END_DEBUG;
-   }
-   if(SmPtr.UartFlag == LS_NO_UART_RECIVE)
-   {
-      if(SmPtr.DebugFlag == LS_NO_DEBUG)
-      {
-         SmPtr.NewEvent = SM_EVENT_END_DEBUG;
-      }
+      SmPtr.DeepSleepFlag = SM_FLAG_RESET;
+      // HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+      SmPtr.NewEvent = SM_EVENT_END_SLEEP;
    }
    else
    {
-      SmPtr.NewEvent = SM_EVENT_UART;
+      // HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+      SmPtr.NewEvent = SM_EVENT_END_SLEEP;
    }
 }
-static void SM_ErrorFunction()
+void MAX_CommandTestFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart)
 {
-}
 #ifndef DEBUG_SWDIO
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
-{
-   if(SmPtr.DebugFlag == LS_DEBUG_COMMUNICATION)
-   {
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_TRANSMIT);
-      HAL_UART_Transmit(huart, data, Size, 1000);
-      uint8_t d[20];
-      uint8_t l = sprintf((char *)d, "%d \n", Size);
-      HAL_UART_Transmit(huart, d, l, 1000);
-      HAL_GPIO_WritePin(MAX485_Selector_GPIO_Port, MAX485_Selector_Pin, LS_LISTENING);
-      HAL_UARTEx_ReceiveToIdle_DMA(huart, data, 1000);
-      SizeUartData   = Size;
-      SmPtr.UartFlag = LS_UART_RECIVE;
-   }
-   else
-   {
-      SizeUartData   = Size;
-      SmPtr.UartFlag = LS_UART_RECIVE;
-      HAL_UARTEx_ReceiveToIdle_DMA(huart, data, 1000);
-   }
-}
+   uint8_t Temp = MAX_OK;
+   MAX_SendData(MAX_ODWS, MAX_MESSAGE, &Temp, 1);
 #endif
+}
+void MAX_CommandStartMeasurmentFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart)
+{
+   SmPtr.MeasurmentFlag = SM_FLAG_SET;
+}
+void MAX_CommandGoToDeepSleepFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart)
+{
+}
+
+
