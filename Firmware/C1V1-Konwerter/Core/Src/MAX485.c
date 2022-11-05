@@ -8,7 +8,10 @@
 #include "MAX485.h"
 #include "MAXProtocol.h"
 #include "main.h"
+#include"SM.h"
+#ifndef DEBUG_SWDIO
 #include "usart.h"
+
 static MAX_TypeDef *MAX;
 static void MAX485_ListeningMode(void)
 {
@@ -43,3 +46,4 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size)
       MAX_InterruptTask();
    }
 }
+#endif

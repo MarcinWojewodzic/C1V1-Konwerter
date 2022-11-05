@@ -10,6 +10,7 @@
 #define TRANSITION_TABLE_SIZE sizeof(TransitionTable) / sizeof(SmTransitionTable_TypeDef)
 #define COMMANDS_TABLE_SIZE   sizeof(LsCommands) / sizeof(LsCommands_TypeDef)
 #include "main.h"
+//#define DEBUG_SWDIO
 typedef enum
 {
    SM_STATE_INITIALIZE,

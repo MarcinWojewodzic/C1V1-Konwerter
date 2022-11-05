@@ -1,7 +1,7 @@
-../Core/Src/bh1750.c:9:6:bh1750_TransmitData	40	static
-../Core/Src/bh1750.c:13:6:bh1750_ReceiveData	40	static
+../Core/Src/bh1750.c:9:6:bh1750_TransmitData	16	static
+../Core/Src/bh1750.c:13:6:bh1750_ReceiveData	16	static
 ../Core/Src/bh1750.c:17:6:bh1750_ChangeState	16	static
-../Core/Src/bh1750.c:23:6:bh1750_SendStartMeasurment	16	static
-../Core/Src/bh1750.c:30:10:bh1750_ReadMeasurment	32	static
-../Core/Src/bh1750.c:36:10:bh1750_ReadLuxOneTime	32	static
-../Core/Src/bh1750.c:43:6:bh1750_Init	24	static
+../Core/Src/bh1750.c:23:6:bh1750_SendStartMeasurment	8	static
+../Core/Src/bh1750.c:30:10:bh1750_ReadMeasurment	16	static
+../Core/Src/bh1750.c:36:10:bh1750_ReadLuxOneTime	8	static
+../Core/Src/bh1750.c:43:6:bh1750_Init	16	static

@@ -1,6 +1,4 @@
-../Core/Src/MAX485.c:13:13:MAX485_ListeningMode	8	static
-../Core/Src/MAX485.c:17:13:MAX485_TransmitMode	8	static
-../Core/Src/MAX485.c:21:6:MAX485_ReciveToIdleDMA	16	static
-../Core/Src/MAX485.c:26:6:MAX485_TransmitData	24	static,ignoring_inline_asm
-../Core/Src/MAX485.c:34:6:MAX485_Init	16	static
-../Core/Src/MAX485.c:38:6:HAL_UARTEx_RxEventCallback	16	static
+../Core/Src/MAX485.c:24:6:MAX485_ReciveToIdleDMA	16	static
+../Core/Src/MAX485.c:29:6:MAX485_TransmitData	24	static,ignoring_inline_asm
+../Core/Src/MAX485.c:37:6:MAX485_Init	0	static
+../Core/Src/MAX485.c:41:6:HAL_UARTEx_RxEventCallback	8	static

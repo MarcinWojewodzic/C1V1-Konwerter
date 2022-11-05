@@ -13,7 +13,7 @@
 #ifndef DEBUG_SWDIO
 #include "MAXProtocol.h"
 #endif
-// #define DEBUG_SWDIO
+#include "adc.h"
 static void SM_ChangeState(void);
 static void SM_InitializeFunction(void);
 static void SM_RunningFunction(void);
@@ -66,17 +66,26 @@ static void SM_ChangeState(void)
 }
 static void SM_InitializeFunction(void)
 {
-
+#ifndef DEBUG_SWDIO
    MAX_Init(&MAX, MAX_BS);
    MAX_RegisterCommandFunction(MAX_TEST, MAX_CommandTestFunction);
    MAX_RegisterCommandFunction(MAX_START_MEASURMENT, MAX_CommandStartMeasurmentFunction);
    MAX_RegisterCommandFunction(MAX_GO_TO_DEEP_SLEEP, MAX_CommandGoToDeepSleepFunction);
-
+#endif
+   uint16_t *TempPtr = 0x1FFF75A8;
+   uint16_t TS_CAL1  = *TempPtr, TS_CAL2;
+   TempPtr           = 0x1FFF75CA;
+   TS_CAL2           = *TempPtr;
    bh1750_Init(&Bh, &hi2c2, 35, One_Time_H_Resolution_Mode);
+   HAL_ADC_Start(&hadc1);
+   HAL_ADC_PollForConversion(&hadc1, 1000);
+   uint16_t data  = HAL_ADC_GetValue(&hadc1);
    SmPtr.NewEvent = SM_EVENT_INITIALIZE_OK;
+   float temp     = (((130.0 - 30.0) / ((float)TS_CAL2 - (float)TS_CAL1)) * (data - (float)TS_CAL1)) + 30.0;
 }
 static void SM_RunningFunction(void)
 {
+#ifndef DEBUG_SWDIO
    if(MAX.State == MAX_STATE_IDLE)
    {
       if(SmPtr.MeasurmentFlag == SM_FLAG_SET)
@@ -91,13 +100,22 @@ static void SM_RunningFunction(void)
          SmPtr.NewEvent = SM_EVENT_END_RUNNING;
       }
    }
+#endif
+#ifdef DEBUG_SWDIO
+   SmPtr.NewEvent = SM_EVENT_END_RUNNING;
+#endif
 }
 static void SM_WaitForSendFunction(void)
 {
+#ifndef DEBUG_SWDIO
    if(MAX.State == MAX_STATE_IDLE)
    {
       SmPtr.NewEvent = SM_EVENT_END_RUNNING;
    }
+#endif
+#ifdef DEBUG_SWDIO
+   SmPtr.NewEvent = SM_EVENT_END_RUNNING;
+#endif
 }
 static void SM_SleepFunction(void)
 {
@@ -128,5 +146,3 @@ void MAX_CommandStartMeasurmentFunction(uint8_t *Data, uint32_t DataSize, uint32
 void MAX_CommandGoToDeepSleepFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart)
 {
 }
-
-
