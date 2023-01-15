@@ -21,7 +21,6 @@ static void SM_WaitForSendFunction(void);
 static void SM_SleepFunction(void);
 void MAX_CommandTestFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart);
 void MAX_CommandStartMeasurmentFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart);
-void MAX_CommandGoToDeepSleepFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart);
 SmTransitionTable_TypeDef TransitionTable[] = { { SM_STATE_INITIALIZE, SM_STATE_RUNNING, SM_EVENT_INITIALIZE_OK },
                                                 { SM_STATE_RUNNING, SM_STATE_SLEEP, SM_EVENT_END_RUNNING },
                                                 { SM_STATE_SLEEP, SM_STATE_RUNNING, SM_EVENT_END_SLEEP },
@@ -70,18 +69,18 @@ static void SM_InitializeFunction(void)
    MAX_Init(&MAX, MAX_BS);
    MAX_RegisterCommandFunction(MAX_TEST, MAX_CommandTestFunction);
    MAX_RegisterCommandFunction(MAX_START_MEASURMENT, MAX_CommandStartMeasurmentFunction);
-   MAX_RegisterCommandFunction(MAX_GO_TO_DEEP_SLEEP, MAX_CommandGoToDeepSleepFunction);
 #endif
    uint16_t *TempPtr = 0x1FFF75A8;
-   uint16_t TS_CAL1  = *TempPtr, TS_CAL2;
+   SmPtr.TS_CAL1     = *TempPtr;
    TempPtr           = 0x1FFF75CA;
-   TS_CAL2           = *TempPtr;
+   SmPtr.TS_CAL2     = *TempPtr;
    bh1750_Init(&Bh, &hi2c2, 35, One_Time_H_Resolution_Mode);
    HAL_ADC_Start(&hadc1);
    HAL_ADC_PollForConversion(&hadc1, 1000);
-   uint16_t data  = HAL_ADC_GetValue(&hadc1);
-   SmPtr.NewEvent = SM_EVENT_INITIALIZE_OK;
-   float temp     = (((130.0 - 30.0) / ((float)TS_CAL2 - (float)TS_CAL1)) * (data - (float)TS_CAL1)) + 30.0;
+   uint16_t data     = HAL_ADC_GetValue(&hadc1);
+   SmPtr.MeasurmentFlag=SM_FLAG_SET;
+   SmPtr.Temperature = (((130.0 - 30.0) / ((float)SmPtr.TS_CAL2 - (float)SmPtr.TS_CAL1)) * (data - (float)SmPtr.TS_CAL1)) + 30.0;
+   SmPtr.NewEvent    = SM_EVENT_INITIALIZE_OK;
 }
 static void SM_RunningFunction(void)
 {
@@ -93,7 +92,25 @@ static void SM_RunningFunction(void)
          SmPtr.MeasurmentFlag = SM_FLAG_RESET;
          SmPtr.Brightness     = bh1750_ReadLuxOneTime(&Bh);
          SmPtr.NewEvent       = SM_EVENT_START_SENDING;
-         MAX_SendData(MAX_ODWS, MAX_DATA, (uint8_t *)&SmPtr.Brightness, 2);
+         HAL_ADC_Start(&hadc1);
+         HAL_ADC_PollForConversion(&hadc1, 1000);
+         uint16_t data     = HAL_ADC_GetValue(&hadc1);
+         SmPtr.Temperature = (((130.0 - 30.0) / ((float)SmPtr.TS_CAL2 - (float)SmPtr.TS_CAL1)) * (data - (float)SmPtr.TS_CAL1)) + 30.0;
+         uint8_t Data[20];
+         Data[0]          = MAX_BRIGHTNESS;
+         Data[1]          = (SmPtr.Brightness >> 8) & 0xff;
+         Data[2]          = (SmPtr.Brightness & 0xff);
+         uint8_t *TempPtr = &SmPtr.Temperature;
+         Data[3]          = MAX_EXTERNAL_MODULE_TEMPERATURE;
+         Data[4]          = *TempPtr;
+         TempPtr++;
+         Data[5] = *TempPtr;
+         TempPtr++;
+         Data[6] = *TempPtr;
+         TempPtr++;
+         Data[7] = *TempPtr;
+         MAX_SendData(MAX_ODWS, MAX_DATA, Data, 8);
+         MAX_Handle();
       }
       else
       {
@@ -120,17 +137,10 @@ static void SM_WaitForSendFunction(void)
 static void SM_SleepFunction(void)
 {
 
-   if(SmPtr.DeepSleepFlag == SM_FLAG_SET)
-   {
-      SmPtr.DeepSleepFlag = SM_FLAG_RESET;
-      // HAL_PWR_EnterSTOPMode(PWR_LOWPOWERREGULATOR_ON, PWR_SLEEPENTRY_WFI);
-      SmPtr.NewEvent = SM_EVENT_END_SLEEP;
-   }
-   else
-   {
-      // HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
-      SmPtr.NewEvent = SM_EVENT_END_SLEEP;
-   }
+   HAL_SuspendTick();
+   HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+   HAL_ResumeTick();
+   SmPtr.NewEvent = SM_EVENT_END_SLEEP;
 }
 void MAX_CommandTestFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart)
 {
@@ -142,7 +152,4 @@ void MAX_CommandTestFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStar
 void MAX_CommandStartMeasurmentFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart)
 {
    SmPtr.MeasurmentFlag = SM_FLAG_SET;
-}
-void MAX_CommandGoToDeepSleepFunction(uint8_t *Data, uint32_t DataSize, uint32_t DataStart)
-{
 }

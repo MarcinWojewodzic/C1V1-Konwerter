@@ -9,8 +9,8 @@
 #define INC_MAX_H_
 #include "main.h"
 #define MAX_TRANSITION_TABLE_SIZE sizeof(MAXTransitionTable) / sizeof(MAXTransitionTable_TypeDef)
-#define MAX_COMMAND_CNT           3
-#define MAX_MESSAGE_CNT           4
+#define MAX_COMMAND_CNT           4
+#define MAX_MESSAGE_CNT           5
 typedef enum
 {
    MAX_BS   = 0x01,
@@ -49,14 +49,16 @@ typedef enum
 {
    MAX_TEST             = 0x01,
    MAX_START_MEASURMENT = 0x02,
-   MAX_GO_TO_DEEP_SLEEP = 0x03
+   MAX_GO_TO_DEEP_SLEEP = 0x03,
+   MAX_RESET            = 0x04
 } MAXCommands_TypeDef;
 typedef enum
 {
-   MAX_ERROR       = 0x01,
-   MAX_CRC_ERROR   = 0x02,
-   MAX_LOW_BATTERY = 0x03,
-   MAX_OK          = 0x04
+   MAX_ERROR           = 0x01,
+   MAX_CRC_ERROR       = 0x02,
+   MAX_LOW_BATTERY     = 0x03,
+   MAX_OK              = 0x04,
+   MAX_EXIT_DEEP_SLEEP = 0x05
 } MAXMessage_TypeDef;
 typedef enum
 {
@@ -66,16 +68,18 @@ typedef enum
 } MAXMessageType_TypeDef;
 typedef enum
 {
-   MAX_ERROR_SIZE       = 0x00,
-   MAX_CRC_ERROR_SIZE   = 0x00,
-   MAX_LOW_BATTERY_SIZE = 0x04,
-   MAX_OK_SIZE          = 0x00
+   MAX_ERROR_SIZE           = 0x00,
+   MAX_CRC_ERROR_SIZE       = 0x00,
+   MAX_LOW_BATTERY_SIZE     = 0x04,
+   MAX_OK_SIZE              = 0x00,
+   MAX_EXIT_DEEP_SLEEP_SIZE = 0x00
 } MAXMessageDataSize_TypeDef;
 typedef enum
 {
    MAX_TEST_SIZE             = 0x00,
    MAX_START_MEASURMENT_SIZE = 0x00,
-   MAX_GO_TO_DEEP_SLEEP_SIZE = 0x02
+   MAX_GO_TO_DEEP_SLEEP_SIZE = 0x02,
+   MAX_RESET_SIZE            = 0x00
 } MAXCommandDataSize_TypeDef;
 typedef enum
 {
@@ -156,6 +160,5 @@ void MAX_RegisterDataFunction(void (*Callback)(uint8_t *, uint32_t, uint32_t));
 void MAX_RegisterMessageFunction(MAXMessage_TypeDef Message, void (*Callback)(uint8_t *, uint32_t, uint32_t));
 void MAX_InterruptTask(void);
 void MAX_SendData(MAXDeviceID_TypeDef Destination, MAXMessageType_TypeDef Type, uint8_t *Data, uint32_t Length);
-
 
 #endif /* INC_MAX_H_ */

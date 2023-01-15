@@ -10,13 +10,13 @@
 #define TRANSITION_TABLE_SIZE sizeof(TransitionTable) / sizeof(SmTransitionTable_TypeDef)
 #define COMMANDS_TABLE_SIZE   sizeof(LsCommands) / sizeof(LsCommands_TypeDef)
 #include "main.h"
-//#define DEBUG_SWDIO
+// #define DEBUG_SWDIO
 typedef enum
 {
    SM_STATE_INITIALIZE,
    SM_STATE_RUNNING,
    SM_STATE_WAIT_FOR_SEND,
-   SM_STATE_SLEEP,
+   SM_STATE_SLEEP
 } SmState_TypeDef;
 typedef enum
 {
@@ -24,7 +24,7 @@ typedef enum
    SM_EVENT_INITIALIZE_OK,
    SM_EVENT_END_RUNNING,
    SM_EVENT_END_SLEEP,
-   SM_EVENT_START_SENDING
+   SM_EVENT_START_SENDING,
 } SmEvent_TypeDef;
 typedef enum
 {
@@ -52,8 +52,9 @@ typedef struct
    SmState_TypeDef State;
    SmEvent_TypeDef NewEvent;
    SmFlag_TypeDef MeasurmentFlag;
-   SmFlag_TypeDef DeepSleepFlag;
    uint16_t Brightness;
+   float Temperature;
+   uint16_t TS_CAL1, TS_CAL2;
 } Sm_TypeDef;
 void SM_MainFunction();
 #endif /* INC_SM_H_ */

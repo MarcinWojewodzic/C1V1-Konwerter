@@ -1,8 +1,7 @@
-../Core/Src/SM.c:108:13:SM_WaitForSendFunction	0	static
-../Core/Src/SM.c:120:13:SM_SleepFunction	0	static
-../Core/Src/SM.c:142:6:MAX_CommandStartMeasurmentFunction	0	static
-../Core/Src/SM.c:146:6:MAX_CommandGoToDeepSleepFunction	0	static
-../Core/Src/SM.c:135:6:MAX_CommandTestFunction	16	static
-../Core/Src/SM.c:67:13:SM_InitializeFunction	8	static
-../Core/Src/SM.c:86:13:SM_RunningFunction	8	static
-../Core/Src/SM.c:36:6:SM_MainFunction	16	static
+../Core/Src/SM.c:125:13:SM_WaitForSendFunction	0	static
+../Core/Src/SM.c:152:6:MAX_CommandStartMeasurmentFunction	0	static
+../Core/Src/SM.c:137:13:SM_SleepFunction	8	static
+../Core/Src/SM.c:145:6:MAX_CommandTestFunction	16	static
+../Core/Src/SM.c:85:13:SM_RunningFunction	48	static
+../Core/Src/SM.c:66:13:SM_InitializeFunction	32	static
+../Core/Src/SM.c:35:6:SM_MainFunction	8	static
